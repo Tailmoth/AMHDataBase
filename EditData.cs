@@ -47,10 +47,5 @@ namespace AeroMaterialHandlingDatabaseApplication
         {
 
         }
-
-        private void lbEditTagView_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
     }
 }
