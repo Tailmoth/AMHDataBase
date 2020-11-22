@@ -163,7 +163,6 @@
             this.lbEditTagView.Name = "lbEditTagView";
             this.lbEditTagView.Size = new System.Drawing.Size(282, 173);
             this.lbEditTagView.TabIndex = 42;
-            this.lbEditTagView.SelectedIndexChanged += new System.EventHandler(this.lbEditTagView_SelectedIndexChanged);
             // 
             // btTagAdd
             // 
