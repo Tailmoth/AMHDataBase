@@ -45,9 +45,9 @@
             // 
             this.btlogin.BackColor = System.Drawing.Color.Yellow;
             this.btlogin.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
-            this.btlogin.Location = new System.Drawing.Point(231, 159);
+            this.btlogin.Location = new System.Drawing.Point(208, 147);
             this.btlogin.Name = "btlogin";
-            this.btlogin.Size = new System.Drawing.Size(84, 32);
+            this.btlogin.Size = new System.Drawing.Size(79, 32);
             this.btlogin.TabIndex = 0;
             this.btlogin.Text = "Login";
             this.btlogin.UseVisualStyleBackColor = false;
@@ -80,7 +80,7 @@
             // 
             this.btLoginExit.BackColor = System.Drawing.Color.Yellow;
             this.btLoginExit.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
-            this.btLoginExit.Location = new System.Drawing.Point(332, 159);
+            this.btLoginExit.Location = new System.Drawing.Point(327, 147);
             this.btLoginExit.Name = "btLoginExit";
             this.btLoginExit.Size = new System.Drawing.Size(79, 32);
             this.btLoginExit.TabIndex = 5;
@@ -145,7 +145,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ButtonShadow;
-            this.ClientSize = new System.Drawing.Size(466, 208);
+            this.ClientSize = new System.Drawing.Size(466, 190);
             this.Controls.Add(this.pbLogo);
             this.Controls.Add(this.lblUserErrorLogIn);
             this.Controls.Add(this.tbPasswordLogIn);

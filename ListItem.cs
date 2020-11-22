@@ -56,5 +56,9 @@ namespace AeroMaterialHandlingDatabaseApplication
 
         }
 
+        private void pbPictureListItem_DoubleClick(object sender, EventArgs e)
+        {
+
+        }
     }
 }
