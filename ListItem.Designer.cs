@@ -43,6 +43,7 @@
             this.pbPictureListItem.Size = new System.Drawing.Size(150, 150);
             this.pbPictureListItem.TabIndex = 0;
             this.pbPictureListItem.TabStop = false;
+            this.pbPictureListItem.DoubleClick += new System.EventHandler(this.pbPictureListItem_DoubleClick);
             // 
             // lblTitleListItem
             // 
