@@ -15,9 +15,9 @@ namespace AeroMaterialHandlingDatabaseApplication
     public partial class fViewPage : Form
     {
         OleDbConnection con = new OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\\Users\\pc\\OneDrive\\Aero_Material_Handling.accdb");
-        OleDbCommand cmd;
-        OleDbDataAdapter da;
-        DataTable dt;
+        //OleDbCommand cmd;
+        //OleDbDataAdapter da;
+        //DataTable dt;
         public fViewPage()
         {
             InitializeComponent();
