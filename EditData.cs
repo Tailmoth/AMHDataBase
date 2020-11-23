@@ -69,29 +69,48 @@ namespace AeroMaterialHandlingDatabaseApplication
 
             lbEditTagView.Items.Add(tbEditAddTags);
 
-            string title = tbEditTitle.Text;
-            string shortDesc = tbEditShortDesc.Text;
-            string longDesc = tbEditLongDesc.Text;
-
             //QUERIES
-            
-            //
-            for(int i = 0; i <= lbEditTagView.Items.Count; i++)
+
+            string amhDatabase = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=|DataDirectory|\\Aero_Material_Handling.accdb";
+            string entries = "insert into AMH_Entries (entryTitle,entryDescShort,entryDescLong) values ('" + this.tbEditTitle.Text + "','" + this.tbEditShortDesc.Text + "','" + this.tbEditLongDesc.Text + "')";
+            OleDbConnection con = new OleDbConnection(amhDatabase);
+            OleDbCommand cmd = new OleDbCommand(entries, con);
+            OleDbDataReader dbr;
+            try
             {
-                //INSERT INTO AMH_Tags(tagName) VALUE(lbEditTagView.SetSelected(i))
+
+                for (int i = 0; i <= lbEditTagView.Items.Count; i++)
+                {
+                    //loop through the list box and add to database
+                }
+                
+
+                con.Open();
+                dbr = cmd.ExecuteReader();
+
+                MessageBox.Show("Entry saved.", "Save", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                while (dbr.Read())
+                {
+
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Error saving entry.", "Error");
             }
 
-
-            //INSERT INTO AMH_Entries(entryTitle, enteredBy, entryDate, entryDetails, entryConfidence, entyrVerify) VALUES(title, ) THIS QUERY NEEDS TO BE FINISHED
+            
 
         }
 
         private void btClear_Click(object sender, EventArgs e)
         {
-            tbEditLongDesc.Text = "";
-            tbEditShortDesc.Text = "";
-            tbEditTitle.Text = "";
-            tbEditAddTags.Text = "";
+            
+            tbEditAddTags.Clear();
+            tbEditLongDesc.Clear();
+            tbEditShortDesc.Clear();
+            tbEditTitle.Clear();
             lbEditTagView.Items.Clear();
         }
 
@@ -110,15 +129,64 @@ namespace AeroMaterialHandlingDatabaseApplication
             string currentTag = tbEditAddTags.Text;
             lbEditTagView.Items.Add(currentTag);
 
-            tbEditAddTags.Text = "";
+            tbEditAddTags.Clear(); ;
             tbEditAddTags.Focus();
 
-            
+            string amhDatabase = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=|DataDirectory|\\Aero_Material_Handling.accdb";
+            string tags = "insert into AMH_Tags (tagName) values ('" + this.tbEditAddTags.Text + "')";
+            OleDbConnection con = new OleDbConnection(amhDatabase);
+            OleDbCommand cmd = new OleDbCommand(tags, con);
+            OleDbDataReader dbr;
+            try
+            {
+                con.Open();
+                dbr = cmd.ExecuteReader();
+                MessageBox.Show("Tag saved.", "Save", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                while (dbr.Read())
+                {
+                    
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Error saving Tag.", "Error");
+            }
+
         }
 
         private void btEditDeleteTag_Click(object sender, EventArgs e)
         {
             lbEditTagView.Items.RemoveAt(lbEditTagView.SelectedIndex);
+        }
+
+        private void btEditAdd_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btEditAddImage_Click(object sender, EventArgs e)
+        {
+            string amhDatabase = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=|DataDirectory|\\Aero_Material_Handling.accdb";
+            string attachment = "insert into AMH_Attachments (attachmentFile) values ('" + this.pbRegister.Image + "')";
+            OleDbConnection con = new OleDbConnection(amhDatabase);
+            OleDbCommand cmd = new OleDbCommand(attachment, con);
+            OleDbDataReader dbr;
+            try
+            {
+                con.Open();
+                dbr = cmd.ExecuteReader();
+                MessageBox.Show("Attachment saved.", "Save", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                while (dbr.Read())
+                {
+
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Error saving Attachment.", "Error");
+            }
         }
     }
 }
