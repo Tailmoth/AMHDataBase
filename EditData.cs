@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.OleDb;
 
+
 namespace AeroMaterialHandlingDatabaseApplication
 {
     public partial class fEditPage : Form
     {
-
 
         OleDbConnection con = new OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=|DataDirectory|\\Aero_Material_Handling.accdb");
         OleDbCommand cmd;
@@ -53,6 +53,7 @@ namespace AeroMaterialHandlingDatabaseApplication
             return maxrow;
         }
 
+
         private void textBox3_TextChanged(object sender, EventArgs e)
         {
             //hello world
@@ -69,124 +70,187 @@ namespace AeroMaterialHandlingDatabaseApplication
 
             lbEditTagView.Items.Add(tbEditAddTags);
 
-            //QUERIES
+            //Establishing a connection to the database to enter new entry data.
+            OleDbConnection con = new OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\\Users\\pc\\OneDrive\\Aero_Material_Handling.accdb");
+            OleDbCommand cmd = new OleDbCommand("select * from AMH_Entries where entryTitle=@entryTitle", con);
+            cmd.Parameters.AddWithValue("@entryTitle", tbEditTitle.Text.ToLower());
+            con.Open();
+            OleDbDataReader dr = cmd.ExecuteReader();
 
-            string amhDatabase = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=|DataDirectory|\\Aero_Material_Handling.accdb";
-            string entries = "insert into AMH_Entries (entryTitle,entryDescShort,entryDescLong) values ('" + this.tbEditTitle.Text + "','" + this.tbEditShortDesc.Text + "','" + this.tbEditLongDesc.Text + "')";
-            OleDbConnection con = new OleDbConnection(amhDatabase);
-            OleDbCommand cmd = new OleDbCommand(entries, con);
-            OleDbDataReader dbr;
             try
             {
 
-                for (int i = 0; i <= lbEditTagView.Items.Count; i++)
+
+                if (dr.HasRows)
                 {
-                    //loop through the list box and add to database
+                    MessageBox.Show("Record(s) already exists in database.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    con.Close();
+                    tbEditAddTags.Clear();
+                    tbEditLongDesc.Clear();
+                    tbEditShortDesc.Clear();
+                    tbEditTitle.Clear();
                 }
-                
-
-                con.Open();
-                dbr = cmd.ExecuteReader();
-
-                MessageBox.Show("Entry saved.", "Save", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                while (dbr.Read())
+                else
                 {
-
+                    con.Close();
+                    con.Open();
+                    cmd = new OleDbCommand("insert into AMH_Entries(entryTitle,entryDescShort,entryDescLong) values(@entryTitle,@entryDescShort,@entryDescLong)", con);
+                    cmd.Parameters.AddWithValue("@entryTitle", tbEditTitle.Text);
+                    cmd.Parameters.AddWithValue("@entryDescShort", tbEditShortDesc.Text);
+                    cmd.Parameters.AddWithValue("@entryDescLong", tbEditLongDesc.Text);
+                    cmd.ExecuteNonQuery();
+                    con.Close();
+                    MessageBox.Show("Record saved.", "Save", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    tbEditAddTags.Clear();
+                    tbEditLongDesc.Clear();
+                    tbEditShortDesc.Clear();
+                    tbEditTitle.Clear();
                 }
             }
             catch (Exception)
             {
-                MessageBox.Show("Error saving entry.", "Error");
+                MessageBox.Show("Error inserting records.", "Error", MessageBoxButtons.OK,MessageBoxIcon.Error);
             }
 
             
-
+                     
         }
 
         private void btClear_Click(object sender, EventArgs e)
         {
-            
             tbEditAddTags.Clear();
             tbEditLongDesc.Clear();
             tbEditShortDesc.Clear();
             tbEditTitle.Clear();
-            lbEditTagView.Items.Clear();
         }
 
         private void btExit_Click(object sender, EventArgs e)
         {
             this.Close();
+            
+
         }
 
         private void pbRegister_Click(object sender, EventArgs e)
         {
+            AllowDrop = true;
+        }
+
+        private void label16_Click(object sender, EventArgs e)
+        {
 
         }
 
-        private void btTagAdd_Click(object sender, EventArgs e)
+        private void fEditPage_Load(object sender, EventArgs e)
         {
-            string currentTag = tbEditAddTags.Text;
-            lbEditTagView.Items.Add(currentTag);
-
-            tbEditAddTags.Clear(); ;
-            tbEditAddTags.Focus();
-
-            string amhDatabase = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=|DataDirectory|\\Aero_Material_Handling.accdb";
-            string tags = "insert into AMH_Tags (tagName) values ('" + this.tbEditAddTags.Text + "')";
-            OleDbConnection con = new OleDbConnection(amhDatabase);
-            OleDbCommand cmd = new OleDbCommand(tags, con);
-            OleDbDataReader dbr;
-            try
-            {
-                con.Open();
-                dbr = cmd.ExecuteReader();
-                MessageBox.Show("Tag saved.", "Save", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                while (dbr.Read())
-                {
-                    
-                }
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("Error saving Tag.", "Error");
-            }
+            
 
         }
 
         private void btEditDeleteTag_Click(object sender, EventArgs e)
         {
             lbEditTagView.Items.RemoveAt(lbEditTagView.SelectedIndex);
+
+
         }
 
         private void btEditAdd_Click(object sender, EventArgs e)
         {
+           
 
         }
 
-        private void btEditAddImage_Click(object sender, EventArgs e)
+        private void btTagAdd_Click(object sender, EventArgs e)
         {
-            string amhDatabase = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=|DataDirectory|\\Aero_Material_Handling.accdb";
-            string attachment = "insert into AMH_Attachments (attachmentFile) values ('" + this.pbRegister.Image + "')";
-            OleDbConnection con = new OleDbConnection(amhDatabase);
-            OleDbCommand cmd = new OleDbCommand(attachment, con);
-            OleDbDataReader dbr;
+
+            string currentTag = tbEditAddTags.Text;
+            lbEditTagView.Items.Add(currentTag);
+
+            tbEditAddTags.Clear(); ;
+            tbEditAddTags.Focus();
+
+            //Establishing a connection to the database to enter new tag data.
+            OleDbConnection con = new OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\\Users\\pc\\OneDrive\\Aero_Material_Handling.accdb");
+            OleDbCommand cmd = new OleDbCommand("select * from AMH_Tags where tagName=@tagName", con);
+            cmd.Parameters.AddWithValue("@tagName", tbEditAddTags.Text.ToLower());
+            con.Open();
+            OleDbDataReader dr = cmd.ExecuteReader();
+
             try
             {
-                con.Open();
-                dbr = cmd.ExecuteReader();
-                MessageBox.Show("Attachment saved.", "Save", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                while (dbr.Read())
+
+                if (dr.HasRows)
                 {
+                    MessageBox.Show("Tag already exists in database.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    con.Close();
+                    tbEditAddTags.Clear();
+                }
+                else
+                {
+                    con.Close();
+                    con.Open();
+                    cmd = new OleDbCommand("insert into AMH_Tags(tagName) values(@tagName)", con);
+                    cmd.Parameters.AddWithValue("@tagName", tbEditAddTags.Text);
+                    cmd.ExecuteNonQuery();
+                    con.Close();
+                    MessageBox.Show("Tag saved.", "Save", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    tbEditAddTags.Clear();
 
                 }
             }
             catch (Exception)
             {
-                MessageBox.Show("Error saving Attachment.", "Error");
+                MessageBox.Show("Error inserting records.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private void btEditAddImage_Click(object sender, EventArgs e)
+        {
+            //Establishing a connection to the database to enter new attachment data
+            OleDbConnection con = new OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\\Users\\pc\\OneDrive\\Aero_Material_Handling.accdb");
+            OleDbCommand cmd = new OleDbCommand("select * from AMH_Attachments where attachmentFile=@attachmentFile", con);
+            cmd.Parameters.AddWithValue("@attachmentFile", pbRegister.Image);
+            con.Open();
+            OleDbDataReader dr = cmd.ExecuteReader();
+
+
+            try
+            {
+
+
+                if (dr.HasRows)
+                {
+                    MessageBox.Show("Attachment already exists in database.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    con.Close();
+
+                }
+                else
+                {
+                    con.Close();
+                    con.Open();
+                    cmd = new OleDbCommand("insert into AMH_Attachments(attachmentFile) values(@attachmentFile)", con);
+                    cmd.Parameters.AddWithValue("@attachmentFile", pbRegister);
+                    cmd.ExecuteNonQuery();
+                    con.Close();
+                    MessageBox.Show("Attachment saved.", "Save", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Error inserting records.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void groupBox1_Enter(object sender, EventArgs e)
+        {
+           
+        }
+
+        
+
+        
     }
 }
