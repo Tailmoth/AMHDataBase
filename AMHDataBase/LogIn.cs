@@ -63,6 +63,7 @@ namespace AeroMaterialHandlingDatabaseApplication
         private void btlogin_Click(object sender, EventArgs e)
         {
             
+            //Esablish connection to database
             int maxrow = 0;
             sql = "select * from AMH_Users where username = '" + tbUserNameLogIn.Text + "' AND password ='" + tbPasswordLogIn.Text + "'";
             maxrow = login(sql);
@@ -84,42 +85,6 @@ namespace AeroMaterialHandlingDatabaseApplication
                 tbPasswordLogIn.Clear();
                 tbUserNameLogIn.Focus();
             }
-
-           
-            //string userName = tbUserNameLogIn.Text.ToUpper(); 
-            //string password = tbPasswordLogIn.Text;
-            //string holderpw = "";
-            //string holderun = "";
-
-            //lblUserErrorLogIn.Visible = false;
-            //lblPasswordErrorLogIn.Visible = false;
-            //if (userName!=holderun)
-            //{
-            //    lblUserErrorLogIn.Text = "Error: User Name is Incorrect";
-            //    lblUserErrorLogIn.Visible = true;
-            //    tbUserNameLogIn.Text = "";
-            //    lblPasswordErrorLogIn.Text = "Error: User Name Error";
-            //    lblPasswordErrorLogIn.Visible = true;
-            //    tbPasswordLogIn.Text = "";
-            //}
-
-            //else if (password!=holderpw)
-            //{
-            //    lblPasswordErrorLogIn.Text = "Error: Password is Incorrect";
-            //    lblPasswordErrorLogIn.Visible = true;
-            //    tbPasswordLogIn.Text = "";
-            //}
-            //else
-            //{
-
-            //    //Close LogIn,the current open form.
-            //    this.Hide();
-            //    //Opens ViewPage
-            //    fViewPage f = new fViewPage();
-            //    f.ShowDialog();
-
-
-            //}
         }
 
         private void lblUserError_Click(object sender, EventArgs e)
