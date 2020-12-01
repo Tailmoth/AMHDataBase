@@ -102,6 +102,9 @@ namespace AeroMaterialHandlingDatabaseApplication
             {
                 MessageBox.Show(ex.Message);
             }
+            Console.Read();
+
+
 
 
             //automatically start populating the flow planel
@@ -116,44 +119,53 @@ namespace AeroMaterialHandlingDatabaseApplication
         //Poplulate the flowpanel left side
         private void populateItems()
         {
-
+            
             OleDbConnection con = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Users\pc\OneDrive\Aero_Material_Handling.accdb");
             con.Open();
-            string searchQuery = "SELECT AMH_Entries.entryTitle, AMH_Entries.entryDescShort, AMH_Tags.tagName " +
-                                 "FROM AMH_Tags INNER JOIN (AMH_Entries INNER JOIN AMH_Tag_Entry ON AMH_Entries.entryID = AMH_Tag_Entry.entryID)" +
-                                 "ON AMH_Tags.tagID = AMH_Tag_Entry.tagID  " +
+            string searchQuery = "select AMH_Entries.entryTitle, AMH_Entries.entryDescShort, AMH_Tags.tagName " +
+                                 "from AMH_Tags inner join (AMH_Entries inner join AMH_Tag_Entry on AMH_Entries.entryID = AMH_Tag_Entry.entryID)" +
+                                 "on AMH_Tags.tagID = AMH_Tag_Entry.tagID  " +
                                  "where entryTitle = '" + tbSearch.Text + "'";
             OleDbCommand com = new OleDbCommand(searchQuery, con);
+            OleDbDataAdapter da = new OleDbDataAdapter(searchQuery, con);
+            DataTable dtFill = new DataTable();
+            da.Fill(dtFill);
+            OleDbDataReader accessReader = com.ExecuteReader();           
 
+            //while (accessReader.Read())
+            //{
+            //    int i = 0;
 
-
-            OleDbDataReader accessReader = com.ExecuteReader();
-
-            while (accessReader.Read())
+            foreach (DataRow row in dtFill.Rows)
             {
-
+                int i = 0;
+                string builder = "";
 
                 ListItem[] listItems = new ListItem[1];
-
-            for (int i = 0; i < listItems.Length; i++)
-            {
-                listItems[i] = new ListItem();
-                listItems[i].Title = accessReader.GetValue(0).ToString();
-                listItems[i].Tags = accessReader.GetValue(2).ToString();
-                listItems[i].shortDesc = accessReader.GetValue(1).ToString();
+                while (accessReader.Read())
+                {
+                    listItems[i] = new ListItem();
+                    listItems[i].Title = accessReader["entryTitle"].ToString();
+                    
+                    //builder = builder + " " + row["tagName"].ToString();
+                    
+                    listItems[i].Tags = accessReader["tagName"].ToString();
+                    listItems[i].shortDesc = accessReader["entryDescShort"].ToString();
+                }
 
                 if (flp1.Controls.Count < 0)
                 {
                     flp1.Controls.Clear();
                 }
                 else
+                {
                     flp1.Controls.Add(listItems[i]);
-
+                }
 
             }
 
-        }
-        accessReader.Close();
+            //}
+            accessReader.Close();
             com.Dispose();
             con.Close();
 
