@@ -43,7 +43,6 @@
             this.pbPictureListItem.Size = new System.Drawing.Size(150, 150);
             this.pbPictureListItem.TabIndex = 0;
             this.pbPictureListItem.TabStop = false;
-            this.pbPictureListItem.DoubleClick += new System.EventHandler(this.pbPictureListItem_DoubleClick);
             // 
             // lblTitleListItem
             // 
@@ -51,9 +50,10 @@
             this.lblTitleListItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblTitleListItem.Location = new System.Drawing.Point(159, 3);
             this.lblTitleListItem.Name = "lblTitleListItem";
-            this.lblTitleListItem.Size = new System.Drawing.Size(55, 24);
+            this.lblTitleListItem.Size = new System.Drawing.Size(50, 24);
             this.lblTitleListItem.TabIndex = 1;
-            this.lblTitleListItem.Text = "Tittle";
+            this.lblTitleListItem.Text = "Title";
+            this.lblTitleListItem.Click += new System.EventHandler(this.lblTitleListItem_Click);
             // 
             // tbShortDescListItem
             // 

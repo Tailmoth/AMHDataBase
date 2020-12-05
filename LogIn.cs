@@ -15,16 +15,17 @@ namespace AeroMaterialHandlingDatabaseApplication
     {
 
         //This creates a connection between C# and AMH database. 
-        OleDbConnection con = new OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=|DataDirectory|\\Aero_Material_Handling.accdb");
+        OleDbConnection con = new OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\\Users\\pc\\OneDrive\\Aero_Material_Handling.accdb");
         OleDbCommand cmd;
         OleDbDataAdapter da;
         DataTable dt;
         string sql;
         public fLogIn()
         {
-            InitializeComponent();                       
+            InitializeComponent();
             this.AcceptButton = btlogin;
         }
+        
 
         private int login(string sql) 
         {
@@ -63,9 +64,10 @@ namespace AeroMaterialHandlingDatabaseApplication
         private void btlogin_Click(object sender, EventArgs e)
         {
             
-            //Esablish connection to database
             int maxrow = 0;
-            sql = "select * from AMH_Users where username = '" + tbUserNameLogIn.Text + "' AND password ='" + tbPasswordLogIn.Text + "'";
+            //Query to pull username and password from DB
+            sql = "select * from AMH_Users " +
+                  "where username = '" + tbUserNameLogIn.Text + "' AND password ='" + tbPasswordLogIn.Text + "'";
             maxrow = login(sql);
 
             if (maxrow > 0)
@@ -85,6 +87,7 @@ namespace AeroMaterialHandlingDatabaseApplication
                 tbPasswordLogIn.Clear();
                 tbUserNameLogIn.Focus();
             }
+                      
         }
 
         private void lblUserError_Click(object sender, EventArgs e)
@@ -94,7 +97,7 @@ namespace AeroMaterialHandlingDatabaseApplication
 
         private void fLogIn_Load(object sender, EventArgs e)
         {
-                    
+            
         }
 
         private void tbUserNameLogIn_TextChanged(object sender, EventArgs e)
