@@ -9,87 +9,52 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.OleDb;
 using Outlook = Microsoft.Office.Interop.Outlook;
+using System.Threading;
+using System.IO;
+using System.Diagnostics;
 
 
 namespace AeroMaterialHandlingDatabaseApplication
 {
     public partial class fEditPage : Form
     {
-
-        //private List<System.Object> _OutlookSelectedItems = null;
-        //private Outlook.Explorer _OutlookActiveExplorer = null;
-        //private System.Timers.Timer _SelectionTimer = null;
-        //private Int32 iTimerCount = 0;
+        protected bool validData;
+        string path;
+        protected Image image;
+        protected Thread getImageThread;       
         public fEditPage()
         {
             InitializeComponent();
             this.AcceptButton = btTagAdd;
             gbDragDrop.AllowDrop = true;
-
+            pbRegister.AllowDrop = true;
+            lbDragDrop.AllowDrop = true;
+            this.lbDragDrop.DragDrop += new System.Windows.Forms.DragEventHandler(this.lbDragDrop_DragDrop);
+            this.lbDragDrop.DragEnter += new System.Windows.Forms.DragEventHandler(this.lbDragDrop_DragEnter);
         }
-        void _SelectionTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+                        
+        private bool GetFilename(out string filename, DragEventArgs e)
         {
-            //_SelectionTimer.Stop();
-
-            //// Try to restore the selected items
-            //OutlookRestoreSelection();
-            
-            //if (_OutlookActiveExplorer.Selection.Count == _OutlookSelectedItems.Count)
-            //{
-            //    _OutlookSelectedItems.Clear();
-            //}
-            //else
-            //{                
-            //    iTimerCount++;
-            //    if (iTimerCount < 50)
-            //        _SelectionTimer.Start();
-            //}
-        }
-        private void OutlookDragDrop()
-        {            
-            //Outlook.Application oOutlook = new Outlook.Application();
-            //if (!oOutlook.Version.StartsWith("14"))
-            //{                
-            //    return;
-            //}
-
-            //Outlook.Explorer oExplorer = oOutlook.ActiveExplorer();
-            //Outlook.Folder oFolder = (Outlook.Folder)oExplorer.CurrentFolder;
-
-            //// Save all the selected items
-            //_OutlookSelectedItems = new List<System.Object>();
-            //for (int i = 1; i <= oExplorer.Selection.Count; i++)
-            //{
-            //    _OutlookSelectedItems.Add(oExplorer.Selection[i]);
-            //}
-
-            
-            //oExplorer.CurrentFolder = oOutlook.GetNamespace("MAPI").GetDefaultFolder(Outlook.OlDefaultFolders.olFolderOutbox);
-            //oExplorer.CurrentFolder = oFolder;
-
-            
-            //_OutlookActiveExplorer = oExplorer;
-            //iTimerCount = 0;
-            //_SelectionTimer.Start();
-
-        }
-        private void OutlookRestoreSelection()
-        {
-            //Try to reselect all the items we have in the selection list
-            //_OutlookActiveExplorer.ClearSelection();
-            //if (_OutlookSelectedItems.Count > 0)
-            //{
-            //    for (int i = 0; i < _OutlookSelectedItems.Count; i++)
-            //    {
-            //        try
-            //        {
-            //            _OutlookActiveExplorer.AddToSelection(_OutlookSelectedItems[i]);
-            //        }
-            //        catch
-            //        {
-            //        }
-            //    }
-            //}
+            //This code reads the file extension of the image being dropped into picture box (pbRegister)
+            bool ret = false;
+            filename = String.Empty;
+            if ((e.AllowedEffect & DragDropEffects.Copy) == DragDropEffects.Copy)
+            {
+                Array data = ((IDataObject)e.Data).GetData("FileDrop") as Array;
+                if (data != null)
+                {
+                    if ((data.Length == 1) && (data.GetValue(0) is String))
+                    {
+                        filename = ((string[])data)[0];
+                        string ext = Path.GetExtension(filename).ToLower();
+                        if ((ext == ".jpg") || (ext == ".png") || (ext == ".bmp") || (ext == ".tif"))
+                        {
+                            ret = true;
+                        }
+                    }
+                }
+            }
+            return ret;
         }
         private void textBox3_TextChanged(object sender, EventArgs e)
         {
@@ -104,7 +69,7 @@ namespace AeroMaterialHandlingDatabaseApplication
 
         private void btSave_Click(object sender, EventArgs e)
         {       
-            clbTagList.Items.Add(tbEditAddTags);
+            lbTagList.Items.Add(tbEditAddTags);
 
             //Establishing a connection to the database to enter new entry data.
             OleDbConnection con = new OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\\Users\\pc\\OneDrive\\Aero_Material_Handling.accdb");
@@ -116,7 +81,9 @@ namespace AeroMaterialHandlingDatabaseApplication
             cmd.Parameters.AddWithValue("@entryTitle", tbEditTitle.Text.ToLower());
             cmd.Parameters.AddWithValue("@entryDescShort", tbEditShortDesc.Text.ToLower());
             cmd.Parameters.AddWithValue("@entryDescLong", tbEditLongDesc.Text.ToLower());
-            cmd.Parameters.AddWithValue("@tagName", clbTagList.Text.ToLower());
+            cmd.Parameters.AddWithValue("@tagName", lbTagList.Text.ToLower());
+            cmd.Parameters.AddWithValue("@attachmentFile", lbDragDrop.Text.ToLower());
+
 
             con.Open();
             OleDbDataReader dr = cmd.ExecuteReader();
@@ -130,61 +97,44 @@ namespace AeroMaterialHandlingDatabaseApplication
                     tbEditLongDesc.Clear();
                     tbEditShortDesc.Clear();
                     tbEditTitle.Clear();
-                    clbTagList.Items.Clear();
+                    lbTagList.Items.Clear();
                 }
                 else
                 {
                     con.Close();
                     con.Open();
-                    cmd = new OleDbCommand("insert into AMH_Entries(entryTitle,entryDescShort,entryDescLong) values(@entryTitle,@entryDescShort,@entryDescLong)", con);              
+                    cmd = new OleDbCommand("insert into AMH_Entries(entryTitle,entryDescShort,entryDescLong) values(@entryTitle,@entryDescShort,@entryDescLong)", con);                    
                     cmd.Parameters.AddWithValue("@entryTitle", tbEditTitle.Text);
                     cmd.Parameters.AddWithValue("@entryDescShort", tbEditShortDesc.Text);
                     cmd.Parameters.AddWithValue("@entryDescLong", tbEditLongDesc.Text);
-
-                    con.Close();
-                    con.Open();
                     cmd.ExecuteNonQuery();
-                    //string[] tagholder = new string[0];
-                    //for (int x = 0; x <= clbTagList.Items.Count; x++)
-                    //{
-                    //    tagholder[x] = clbTagList.Items[x].ToString();
-                    //}
-                    foreach (string item in clbTagList.Items)
+                    foreach (string item in lbTagList.Items)
                     {
-
-                        using (OleDbCommand cmd2 = new OleDbCommand("insert into AMH_Tags (tagName) values (@tagName)", con))
-                        {
-                            cmd2.Parameters.AddWithValue("@tagName", item);
-                            cmd2.ExecuteNonQuery();
-                        }
-
+                        cmd = new OleDbCommand("insert into AMH_Tags(tagName) values(@tagName)", con);
+                        cmd.Parameters.AddWithValue("@tagName", item);
+                        cmd.ExecuteNonQuery();
                     }
-
-
-                    //cmd = new OleDbCommand("insert into AMH_Tags(tagName) values (@tagName)", con);
-                    //int y = 0;
-                    //we tried
-                    //while (y < clbTagList.Items.Count)
-                    //{
-                    //    cmd.Parameters.AddWithValue("@tagName", clbTagList.Text.Equals(clbTagList.Items[y].ToString()));
-
-                    //    y++;
-                    //}                   
-                    //cmd.Parameters.AddWithValue("@tagName", clbTagList.Text);
-                    cmd.ExecuteNonQuery();
-                    con.Close();
-                    MessageBox.Show("Entry saved.", "Save", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    tbEditAddTags.Clear();
-                    tbEditLongDesc.Clear();
-                    tbEditShortDesc.Clear();
-                    tbEditTitle.Clear();
-                    clbTagList.Items.Clear();                    
-                }
-
+                    foreach (string item in lbDragDrop.Items)
+                    {
+                        cmd = new OleDbCommand("insert into AMH_Attachments(attachmentFile) values(@attachmentFile)", con);
+                        cmd.Parameters.AddWithValue("@attachmentFile", item);
+                        cmd.ExecuteNonQuery();
+                    }
+                }              
             }
             catch (Exception)
             {
-                MessageBox.Show("Error inserting records.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Entry saved.", "Save", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                tbEditAddTags.Clear();
+                tbEditLongDesc.Clear();
+                tbEditShortDesc.Clear();
+                tbEditTitle.Clear();
+                lbTagList.Items.Clear();
+                lbDragDrop.Items.Clear();
+            }
+            finally
+            {
+                //MessageBox.Show("Error inserting records.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
         }
@@ -195,7 +145,8 @@ namespace AeroMaterialHandlingDatabaseApplication
             tbEditLongDesc.Clear();
             tbEditShortDesc.Clear();
             tbEditTitle.Clear();
-            clbTagList.Items.Clear();
+            lbTagList.Items.Clear();
+            pbRegister.Image = null;
         }
 
         private void btExit_Click(object sender, EventArgs e)
@@ -224,9 +175,9 @@ namespace AeroMaterialHandlingDatabaseApplication
         private void btEditDeleteTag_Click(object sender, EventArgs e)
         {
             //Deletes tags from listbox
-            while (clbTagList.SelectedItems.Count > 0)
+            while (lbTagList.SelectedItems.Count > 0)
             {
-                clbTagList.Items.Remove(clbTagList.SelectedItems[0]);
+                lbTagList.Items.Remove(lbTagList.SelectedItems[0]);
             }
 
         }
@@ -277,9 +228,9 @@ namespace AeroMaterialHandlingDatabaseApplication
 
 
             string currentTag = tbEditAddTags.Text;
-            clbTagList.Items.Add(currentTag);
+            lbTagList.Items.Add(currentTag);
 
-            tbEditAddTags.Clear(); ;
+            tbEditAddTags.Clear(); 
             tbEditAddTags.Focus();
 
             
@@ -288,40 +239,41 @@ namespace AeroMaterialHandlingDatabaseApplication
         private void btEditAddImage_Click(object sender, EventArgs e)
         {
             //Establishing a connection to the database to enter new attachment data
-            OleDbConnection con = new OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\\Users\\pc\\OneDrive\\Aero_Material_Handling.accdb");
-            OleDbCommand cmd = new OleDbCommand("select * from AMH_Attachments where attachmentFile=@attachmentFile", con);
-            cmd.Parameters.AddWithValue("@attachmentFile", pbRegister.Image);
-            con.Open();
-            OleDbDataReader dr = cmd.ExecuteReader();
+            //OleDbConnection con = new OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\\Users\\pc\\OneDrive\\Aero_Material_Handling.accdb");
+            //OleDbCommand cmd = new OleDbCommand("select * from AMH_Attachments where attachmentFile=@attachmentFile", con);
+            //cmd.Parameters.AddWithValue("@attachmentFile", pbRegister.Image);
+            //con.Open();
+            //OleDbDataReader dr = cmd.ExecuteReader();
+
+            //try
+            //{
 
 
-            try
-            {
+            //    if (dr.HasRows)
+            //    {
+            //        MessageBox.Show("Attachment already exists in database.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            //        con.Close();
+
+            //    }
+            //    else
+            //    {
+            //        con.Close();
+            //        con.Open();
+            //        cmd = new OleDbCommand("insert into AMH_Attachments(attachmentFile) values(@attachmentFile)", con);
+            //        cmd.Parameters.AddWithValue("@attachmentFile", pbRegister.Image);
+            //        cmd.ExecuteNonQuery();
+            //        con.Close();
+            //        MessageBox.Show("Attachment saved.", "Save", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
 
-                if (dr.HasRows)
-                {
-                    MessageBox.Show("Attachment already exists in database.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    con.Close();
+            //    }
+            //}
+            //catch (Exception)
+            //{
+            //    MessageBox.Show("Error inserting records.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //}
+            
 
-                }
-                else
-                {
-                    con.Close();
-                    con.Open();
-                    cmd = new OleDbCommand("insert into AMH_Attachments(attachmentFile) values(@attachmentFile)", con);
-                    cmd.Parameters.AddWithValue("@attachmentFile", pbRegister);
-                    cmd.ExecuteNonQuery();
-                    con.Close();
-                    MessageBox.Show("Attachment saved.", "Save", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-
-                }
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("Error inserting records.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
         }
 
         private void groupBox1_Enter(object sender, EventArgs e)
@@ -331,40 +283,7 @@ namespace AeroMaterialHandlingDatabaseApplication
 
         private void tbEditAddTags_Enter(object sender, EventArgs e)
         {
-            //Establishing a connection to the database to enter new tag data.
-            //OleDbConnection con = new OleDbConnection("Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\\Users\\pc\\OneDrive\\Aero_Material_Handling.accdb");
-            //OleDbCommand cmd = new OleDbCommand("select * from AMH_Tags where tagName=@tagName", con);
-            //cmd.Parameters.AddWithValue("@tagName", tbEditAddTags.Text.ToLower());
-            //con.Open();
-            //OleDbDataReader dr = cmd.ExecuteReader();
-            //attempts to either add tag to entry or to entry and database
-            //try
-            //{
-
-            //    if (dr.HasRows)
-            //    {
-            //        clbTagList.Items.Add(tbEditAddTags.Text);
-            //        tbEditAddTags.Clear();
-            //        tbEditAddTags.Focus();
-            //    }
-            //    else
-            //    {
-            //        con.Close();
-            //        con.Open();
-            //        cmd = new OleDbCommand("insert into AMH_Tags(tagName) values(@tagName)", con);
-            //        cmd.Parameters.AddWithValue("@tagName", tbEditAddTags.Text);
-            //        cmd.ExecuteNonQuery();
-            //        con.Close();
-            //        MessageBox.Show("Tag(s) added to database.", "Save", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            //        clbTagList.Items.Add(tbEditAddTags.Text);
-            //        tbEditAddTags.Clear();
-            //        tbEditAddTags.Focus();
-            //    }
-            //}
-            //catch (Exception)
-            //{
-            //    MessageBox.Show("Error Adding Tag.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //}
+            
 
         }
 
@@ -375,8 +294,6 @@ namespace AeroMaterialHandlingDatabaseApplication
 
         private void groupBox1_DragDrop(object sender, DragEventArgs e)
         {
-            //tbDragDrop.Lines = e.Data.GetFormats();
-            //OutlookDragDrop();
 
         }
 
@@ -388,6 +305,63 @@ namespace AeroMaterialHandlingDatabaseApplication
         private void gbDragDrop_DragOver(object sender, DragEventArgs e)
         {
             e.Effect = DragDropEffects.Copy;
-        }        
+        }
+
+        private void pbRegister_DragEnter(object sender, DragEventArgs e)
+        {
+            string filename;
+            validData = GetFilename(out filename, e);
+            if (validData)
+            {
+                path = filename;
+                getImageThread = new Thread(new ThreadStart(LoadImage));
+                getImageThread.Start();
+                e.Effect = DragDropEffects.Copy;
+            }
+            else
+                e.Effect = DragDropEffects.None;
+        }
+
+        private void pbRegister_DragDrop(object sender, DragEventArgs e)
+        {
+            if (validData)
+            {
+                while (getImageThread.IsAlive)
+                {
+                    Application.DoEvents();
+                    Thread.Sleep(0);
+                }
+                pbRegister.Image = image;
+            }
+        }
+        protected void LoadImage()
+        {
+            image = new Bitmap(path);
+        }
+              
+        private void lbDragDrop_DragDrop(object sender, DragEventArgs e)
+        {            
+            string[] s = (string[])e.Data.GetData(DataFormats.FileDrop, false);
+            int i;
+            for (i = 0; i < s.Length; i++)
+                lbDragDrop.Items.Add(Path.GetFileName(s[i]));
+        }
+
+        private void lbDragDrop_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effect = DragDropEffects.All;
+            else
+                e.Effect = DragDropEffects.None;
+        }
+
+        private void btEditRemove_Click(object sender, EventArgs e)
+        {
+            //Deletes item from the drag and drop listbox
+            while (lbDragDrop.SelectedItems.Count > 0)
+            {
+                lbDragDrop.Items.Remove(lbDragDrop.SelectedItems[0]);
+            }
+        }
     }
 }

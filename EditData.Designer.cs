@@ -42,6 +42,7 @@
             this.tbEditAddTags = new System.Windows.Forms.TextBox();
             this.btTagAdd = new System.Windows.Forms.Button();
             this.gbDragDrop = new System.Windows.Forms.GroupBox();
+            this.lbDragDrop = new System.Windows.Forms.ListBox();
             this.pbUser = new System.Windows.Forms.PictureBox();
             this.label3 = new System.Windows.Forms.Label();
             this.btEditRemove = new System.Windows.Forms.Button();
@@ -49,9 +50,8 @@
             this.btEditDeleteTag = new System.Windows.Forms.Button();
             this.btEditAddImage = new System.Windows.Forms.Button();
             this.pbRegister = new System.Windows.Forms.PictureBox();
-            this.clbTagList = new System.Windows.Forms.ListBox();
+            this.lbTagList = new System.Windows.Forms.ListBox();
             this.pbLogo = new System.Windows.Forms.PictureBox();
-            this.tbDragDrop = new System.Windows.Forms.TextBox();
             this.gbDragDrop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbUser)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbRegister)).BeginInit();
@@ -179,7 +179,7 @@
             // 
             // gbDragDrop
             // 
-            this.gbDragDrop.Controls.Add(this.tbDragDrop);
+            this.gbDragDrop.Controls.Add(this.lbDragDrop);
             this.gbDragDrop.Controls.Add(this.pbUser);
             this.gbDragDrop.Controls.Add(this.label3);
             this.gbDragDrop.Location = new System.Drawing.Point(765, 15);
@@ -190,6 +190,17 @@
             this.gbDragDrop.DragDrop += new System.Windows.Forms.DragEventHandler(this.groupBox1_DragDrop);
             this.gbDragDrop.DragEnter += new System.Windows.Forms.DragEventHandler(this.gbDragDrop_DragEnter);
             this.gbDragDrop.DragOver += new System.Windows.Forms.DragEventHandler(this.gbDragDrop_DragOver);
+            // 
+            // lbDragDrop
+            // 
+            this.lbDragDrop.BackColor = System.Drawing.SystemColors.ControlDarkDark;
+            this.lbDragDrop.FormattingEnabled = true;
+            this.lbDragDrop.Location = new System.Drawing.Point(21, 110);
+            this.lbDragDrop.Name = "lbDragDrop";
+            this.lbDragDrop.Size = new System.Drawing.Size(189, 199);
+            this.lbDragDrop.TabIndex = 6;
+            this.lbDragDrop.DragDrop += new System.Windows.Forms.DragEventHandler(this.lbDragDrop_DragDrop);
+            this.lbDragDrop.DragEnter += new System.Windows.Forms.DragEventHandler(this.lbDragDrop_DragEnter);
             // 
             // pbUser
             // 
@@ -220,6 +231,7 @@
             this.btEditRemove.TabIndex = 45;
             this.btEditRemove.Text = "Remove";
             this.btEditRemove.UseVisualStyleBackColor = true;
+            this.btEditRemove.Click += new System.EventHandler(this.btEditRemove_Click);
             // 
             // btEditAdd
             // 
@@ -263,14 +275,16 @@
             this.pbRegister.TabIndex = 10;
             this.pbRegister.TabStop = false;
             this.pbRegister.Click += new System.EventHandler(this.pbRegister_Click);
+            this.pbRegister.DragDrop += new System.Windows.Forms.DragEventHandler(this.pbRegister_DragDrop);
+            this.pbRegister.DragEnter += new System.Windows.Forms.DragEventHandler(this.pbRegister_DragEnter);
             // 
-            // clbTagList
+            // lbTagList
             // 
-            this.clbTagList.FormattingEnabled = true;
-            this.clbTagList.Location = new System.Drawing.Point(329, 138);
-            this.clbTagList.Name = "clbTagList";
-            this.clbTagList.Size = new System.Drawing.Size(206, 69);
-            this.clbTagList.TabIndex = 49;
+            this.lbTagList.FormattingEnabled = true;
+            this.lbTagList.Location = new System.Drawing.Point(329, 138);
+            this.lbTagList.Name = "lbTagList";
+            this.lbTagList.Size = new System.Drawing.Size(206, 69);
+            this.lbTagList.TabIndex = 49;
             // 
             // pbLogo
             // 
@@ -282,15 +296,6 @@
             this.pbLogo.TabIndex = 50;
             this.pbLogo.TabStop = false;
             // 
-            // tbDragDrop
-            // 
-            this.tbDragDrop.BackColor = System.Drawing.SystemColors.ButtonShadow;
-            this.tbDragDrop.Location = new System.Drawing.Point(17, 122);
-            this.tbDragDrop.Multiline = true;
-            this.tbDragDrop.Name = "tbDragDrop";
-            this.tbDragDrop.Size = new System.Drawing.Size(195, 180);
-            this.tbDragDrop.TabIndex = 6;
-            // 
             // fEditPage
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -298,7 +303,7 @@
             this.BackColor = System.Drawing.SystemColors.ControlDark;
             this.ClientSize = new System.Drawing.Size(1057, 559);
             this.Controls.Add(this.pbLogo);
-            this.Controls.Add(this.clbTagList);
+            this.Controls.Add(this.lbTagList);
             this.Controls.Add(this.btEditAddImage);
             this.Controls.Add(this.btEditDeleteTag);
             this.Controls.Add(this.btEditAdd);
@@ -351,10 +356,10 @@
         private System.Windows.Forms.Button btEditAdd;
         private System.Windows.Forms.Button btEditDeleteTag;
         private System.Windows.Forms.Button btEditAddImage;
-        private System.Windows.Forms.ListBox clbTagList;
+        private System.Windows.Forms.ListBox lbTagList;
         private System.Windows.Forms.PictureBox pbLogo;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.PictureBox pbUser;
-        private System.Windows.Forms.TextBox tbDragDrop;
+        private System.Windows.Forms.ListBox lbDragDrop;
     }
 }
